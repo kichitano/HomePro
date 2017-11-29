@@ -60,7 +60,7 @@ public class ProfesionalActivity extends AppCompatActivity {
         txtemail.setText(email);
         //txtdatos.setText(nombreapellido);
 
-        //btntelefono.setText(telefono);
+        btntelefono.setText("Llamar a "+telefono);
         txtdireccion.setText(direccion);
         imgfoto.setImageBitmap(decodedBitmap);
 
