@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "195218527802",
+    "firebase_url": "https://buscapp-5fa51.firebaseio.com",
+    "project_id": "buscapp-5fa51",
+    "storage_bucket": "buscapp-5fa51.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:195218527802:android:c5dcef12af490260",
+        "android_client_info": {
+          "package_name": "com.example.kichi.buscapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "195218527802-5t3ilrud3ojf15ppdqdejme84vveoegq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.kichi.buscapp",
+            "certificate_hash": "0c3f0022cb68fca735a7d6476e354b49678b756e"
+          }
+        },
+        {
+          "client_id": "195218527802-4mq5s2qim5d4hhe548muqgop3gtrqse0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDc9bp9ig6pasZwrCCLUC0wP6aTEMDVFWA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "195218527802-4mq5s2qim5d4hhe548muqgop3gtrqse0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

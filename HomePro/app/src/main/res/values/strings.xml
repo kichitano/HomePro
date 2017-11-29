@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">HomePro</string>
+    <string name="title_activity_menu2">Especialidades</string>
+    <string name="especialidad">Especialidades</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_scrolling"></string>
+    <string name="large_text">ah?</string>
+    <string name="title_activity_maps">Map</string>
+</resources>
