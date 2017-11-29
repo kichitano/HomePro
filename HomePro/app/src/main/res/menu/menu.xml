@@ -11,11 +11,9 @@
         android:orderInCategory="200"
         android:title="Mejores calificados"
         app:showAsAction="never" />
-    <item
-        android:id="@+id/buscar"
-        android:title="Buscar"
-        android:icon="@android:drawable/ic_menu_search"
-        app:actionViewClass="android:support.v7.widget.SearchView"
-        app:showAsAction="always"
-        />
+    <item android:id="@+id/buscar"
+        android:title="Escriba algo.."
+        android:icon="@drawable/places_ic_search"
+        app:showAsAction="withText|ifRoom"
+        app:actionViewClass="android.widget.SearchView" />
 </menu>

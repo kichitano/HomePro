@@ -26,10 +26,12 @@
             </intent-filter>
         </activity>
         <activity android:name=".Activities.RegistroActivity" />
+
         <activity
             android:name=".Activities.MenuActivity"
             android:label="@string/title_activity_menu2"
-            android:theme="@style/Login" />
+            android:theme="@style/Login"/>
+
         <activity
             android:name=".Activities.ProfesionalActivity"
             android:label="@string/title_activity_scrolling"

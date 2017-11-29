@@ -11,7 +11,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -19,21 +18,24 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.kichi.buscapp.Fragments.EspecialidadFragment;
 import com.example.kichi.buscapp.Fragments.ProfesionalesFragment;
 import com.example.kichi.buscapp.R;
-import com.example.kichi.buscapp.pkgNegocios.ClsNegociosEspecialidad;
-
-import java.util.ArrayList;
+import com.google.android.gms.drive.query.SearchableField;
 
 public class MenuActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -41,6 +43,8 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
     private View mProgressView;
     Boolean Validacion=false;
     int act = 0;
+    SearchView buscador;
+    EditText buscar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -117,6 +121,14 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
         mMenuFormView = findViewById(R.id.contenedor);
         mProgressView = findViewById(R.id.menu_progress);
 
+        /*
+        buscador = (SearchView)findViewById(R.id.buscar);
+        int id = buscador.getContext()
+                .getResources()
+                .getIdentifier("android:id/search_src_text", null, null);
+        buscar = (EditText) buscador.findViewById(id);
+        buscar.addTextChangedListener(textWatcher);
+        */
     }
 
 
@@ -235,6 +247,7 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
         imageView.setImageBitmap(decodedBitmap);
 
         getMenuInflater().inflate(R.menu.menu, menu);
+
         return true;
     }
 
@@ -250,6 +263,10 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
         if (id == R.id.MostrarTodos) {
             return true;
         } else if (id == R.id.MostrarPrincipales){
+
+        } else if (id == R.id.buscar){
+
+            buscar.addTextChangedListener(textWatcher);
 
         }
 
@@ -282,5 +299,30 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
     }
 
 
+
+    //second, we create the TextWatcher
+    TextWatcher textWatcher = new TextWatcher() {
+
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            //here, after we introduced something in the EditText we get the string from it
+            String answerString = buscar.getText().toString();
+            //and now we make a Toast
+            //modify "yourActivity.this" with your activity name .this
+            Toast.makeText(MenuActivity.this,"The string from EditText is: "+answerString,Toast.LENGTH_SHORT).show();
+
+        }
+    };
 
 }
