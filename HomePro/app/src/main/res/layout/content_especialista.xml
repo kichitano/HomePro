@@ -22,7 +22,7 @@
             android:layout_height="wrap_content"
             android:textColor="#009688"
             android:textSize="20dp"
-            android:text="Texto de prueba"
+            android:text="email"
             android:drawableLeft="@drawable/arroba_009688"/>
 
 
@@ -36,8 +36,21 @@
             android:text="Texto de prueba"
             android:textColor="#009688"
             android:textSize="20dp"
+            android:visibility="gone"
             android:drawableLeft="@drawable/ic_gps_fixed_white_18dp_009688"/>
 
+        <Button
+            android:id="@+id/btndireccionProfesional"
+            android:layout_width="390dp"
+            android:layout_marginTop="20dp"
+            android:layout_height="60dp"
+            android:layout_marginStart="10dp"
+            android:text="Ubicacion"
+            android:textSize="20sp"
+            android:textColor="@android:color/background_light"
+            android:background="@drawable/boton"
+
+            />
         <Button
             android:id="@+id/telefonoProfesional"
             android:layout_width="390dp"
