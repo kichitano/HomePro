@@ -234,6 +234,7 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
         String nombre = extras.getString("Nombre");                             //Obtenemos el extra numero
         String apellido = extras.getString("Apellido");                         //Obtenemos el extra textoAzar
         String foto = extras.getString("Foto");
+        String direccionP =  extras.getString("Direccion");
 
         byte[] decodedString = Base64.decode(foto,Base64.DEFAULT);
         Bitmap decodedBitmap = BitmapFactory.decodeByteArray(decodedString,0,decodedString.length);

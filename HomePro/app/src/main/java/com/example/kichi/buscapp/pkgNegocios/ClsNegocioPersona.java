@@ -21,7 +21,7 @@ public class ClsNegocioPersona {
         Boolean validacion;
         con = new ClsConexion();
         Connection connection = con.getConnection();
-        String cadenaSql = "insert into tbl_persona values (?,?,?,?,?,?,?)";
+        String cadenaSql = "insert into tbl_persona values (?,?,?,?,?,?,?,?)";
         try {
 
             PreparedStatement preparedStatement = connection.prepareStatement(cadenaSql);
@@ -29,9 +29,14 @@ public class ClsNegocioPersona {
             preparedStatement.setString(2,persona.getNombre_persona());
             preparedStatement.setString(3,persona.getApellido_persona());
             preparedStatement.setString(4,persona.getTelefono_persona());
-            preparedStatement.setString(5,persona.getDireccion_persona());
-            preparedStatement.setString(6,persona.getPassword_persona());
-            preparedStatement.setString(7,persona.getFoto_persona());
+
+            String[] separated = persona.getDireccion_persona().split("@");
+            preparedStatement.setString(5,separated[0]);
+            preparedStatement.setString(6,separated[1]);
+
+            preparedStatement.setString(7,persona.getPassword_persona());
+            preparedStatement.setString(8,persona.getFoto_persona());
+
             preparedStatement.executeUpdate();
             preparedStatement.close();
             connection.close();

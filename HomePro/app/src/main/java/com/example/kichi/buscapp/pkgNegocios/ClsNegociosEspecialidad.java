@@ -39,7 +39,7 @@ public class ClsNegociosEspecialidad {
         ArrayList<String> profresionalesHogar = new ArrayList<>();
         con = new ClsConexion();
         Connection connection = con.ConnectionHelper();
-        PreparedStatement preparedStatement = connection.prepareStatement("select email_persona,nombre_persona,apellido_persona,telefono_persona,direccion_persona,foto_persona from tbl_especialidad_persona \n" +
+        PreparedStatement preparedStatement = connection.prepareStatement("select email_persona,nombre_persona,apellido_persona,telefono_persona,lat_persona,lng_persona,foto_persona from tbl_especialidad_persona \n" +
                 "inner join tbl_persona on email_persona = email_persona_especialidad_persona\n" +
                 "where id_especialidad_especialidad_persona = ?");
         preparedStatement.setInt(1,idEspecialidad);
@@ -49,7 +49,8 @@ public class ClsNegociosEspecialidad {
             profresionalesHogar.add(rs.getString("nombre_persona"));
             profresionalesHogar.add(rs.getString("apellido_persona"));
             profresionalesHogar.add(rs.getString("telefono_persona"));
-            profresionalesHogar.add(rs.getString("direccion_persona"));
+            String direccion = rs.getString("lat_persona") + "@" + rs.getString("lng_persona");
+            profresionalesHogar.add(direccion);
             profresionalesHogar.add(rs.getString("foto_persona"));
         }
         preparedStatement.close();
@@ -62,7 +63,7 @@ public class ClsNegociosEspecialidad {
         con = new ClsConexion();
         Connection connection = con.ConnectionHelper();
         PreparedStatement preparedStatement = connection.prepareStatement("select email_persona_especialidad_persona,nombre_persona,apellido_persona,\n" +
-                "telefono_persona,direccion_persona,foto_persona \n" +
+                "telefono_persona,lat_persona,lng_persona,,foto_persona \n" +
                 "from (select email_persona_especialidad_persona from tbl_especialidad_persona group by email_persona_especialidad_persona) esp_persona \n" +
                 "inner join tbl_persona on email_persona = esp_persona.email_persona_especialidad_persona");
         ResultSet rs = preparedStatement.executeQuery();
@@ -71,7 +72,8 @@ public class ClsNegociosEspecialidad {
             todosProfresionalesHogar.add(rs.getString("nombre_persona"));
             todosProfresionalesHogar.add(rs.getString("apellido_persona"));
             todosProfresionalesHogar.add(rs.getString("telefono_persona"));
-            todosProfresionalesHogar.add(rs.getString("direccion_persona"));
+            String direccion = rs.getString("lat_persona") + "@" + rs.getString("lng_persona");
+            todosProfresionalesHogar.add(direccion);
             todosProfresionalesHogar.add(rs.getString("foto_persona"));
         }
         preparedStatement.close();

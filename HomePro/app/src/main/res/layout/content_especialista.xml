@@ -11,7 +11,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingBottom="20dp">
 
 
         <TextView
@@ -61,9 +62,12 @@
             android:textSize="20sp"
             android:textColor="@android:color/background_light"
             android:background="@drawable/boton"
-
             />
 
+        <Space
+            android:id="@+id/spacio"
+            android:layout_width="match_parent"
+            android:layout_height="30dp" />
 
     </LinearLayout>
 

@@ -17,7 +17,7 @@ public class ClsLogin {
     public ClsEntidadPersona verificarLogin(String email_persona,String contrasena_persona) throws SQLException {
         con = new ClsConexion();
         ClsEntidadPersona usuario = null;
-        String cadenaSql = "select email_persona,nombre_persona,apellido_persona,telefono_persona,direccion_persona,foto_persona from tbl_persona where email_persona = ? and contrasena_persona= ?";
+        String cadenaSql = "select email_persona,nombre_persona,apellido_persona,telefono_persona,lat_persona,lng_persona,foto_persona from tbl_persona where email_persona = ? and contrasena_persona= ?";
         Connection connection = con.getConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(cadenaSql);
         preparedStatement.setString(1,email_persona);
@@ -29,8 +29,11 @@ public class ClsLogin {
             usuario.setNombre_persona(resultSet.getString(2));
             usuario.setApellido_persona(resultSet.getString(3));
             usuario.setTelefono_persona(resultSet.getString(4));
-            usuario.setDireccion_persona(resultSet.getString(5));
-            usuario.setFoto_persona(resultSet.getString(6));
+
+            String dir = resultSet.getString(5) + '@' + resultSet.getString(6);
+            usuario.setDireccion_persona(dir);
+
+            usuario.setFoto_persona(resultSet.getString(7));
         }
         preparedStatement.close();
         connection.close();

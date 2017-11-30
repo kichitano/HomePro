@@ -172,6 +172,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 bundle.putString("Apellido",entidadPersona.getApellido_persona());
                 bundle.putString("Email",entidadPersona.getEmail_persona());
                 bundle.putString("Foto",entidadPersona.getFoto_persona());
+                bundle.putString("Direccion",entidadPersona.getDireccion_persona());
+
                 intent.putExtras(bundle);
                 startActivity(intent);
                 toast.show();
