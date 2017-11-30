@@ -40,6 +40,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
     Marker mCurrLocationMarker;
+    Marker locU,locP;
     int CONT = 0;
     int codigo;
     double lat,lng;
@@ -135,6 +136,35 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                             }
                         }
                     });
+                }else {
+
+                    LatLng latLngU = new LatLng(Double.parseDouble(latU),Double.parseDouble(lngU));
+                    MarkerOptions markerU = new MarkerOptions();
+                    markerU.position(latLngU);
+                    markerU.title("Yo :)");
+                    markerU.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+                    locU = mGoogleMap.addMarker(markerU);
+                    locU.showInfoWindow();
+
+                    LatLng latLngP = new LatLng(Double.parseDouble(latP),Double.parseDouble(lngP));
+                    MarkerOptions markerP = new MarkerOptions();
+                    markerP.position(latLngP);
+                    markerP.title(datosP);
+                    markerP.snippet("Llamar a "+telefonoP);
+                    markerP.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                    locP = mGoogleMap.addMarker(markerP);
+                    locP.showInfoWindow();
+                    locP.setTag(telefonoP);
+
+                    mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLngU,18));
+
+                    mGoogleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                        @Override
+                        public boolean onMarkerClick(Marker marker) {
+                            MtdLlamar();
+                            return false;
+                        }
+                    });
                 }
 
             } else {
@@ -201,30 +231,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             lat = location.getLongitude();
 
             CONT = 1;
-        }else{
-            LatLng latLngU = new LatLng(Double.parseDouble(latU),Double.parseDouble(lngU));
-            MarkerOptions markerU = new MarkerOptions();
-
-            markerU.position(latLngU);
-            markerU.title("Yo :)");
-            markerU.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
-            mCurrLocationMarker = mGoogleMap.addMarker(markerU);
-
-            LatLng latLngP = new LatLng(Double.parseDouble(latP),Double.parseDouble(lngP));
-            MarkerOptions markerP = new MarkerOptions();
-
-            markerP.position(latLngP);
-            markerP.title(datosP);
-            markerP.snippet("Llamar a "+telefonoP);
-
-            markerP.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-            mCurrLocationMarker = mGoogleMap.addMarker(markerP);
-
-            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLngU,18));
-
-
         }
-
     }
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
@@ -306,6 +313,26 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         data.setData(Uri.parse(latlng));
         setResult(RESULT_OK, data);
         finish();
+    }
+
+    public void MtdLlamar(){
+        Intent callIntent = new Intent(Intent.ACTION_CALL); //use ACTION_CALL class
+        callIntent.setData(Uri.parse("tel:" + telefonoP));    //this is the phone number calling
+        //check permission
+        //If the device is running Android 6.0 (API level 23) and the app's targetSdkVersion is 23 or higher,
+        //the system asks the user to grant approval.
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            //request permission from user if the app hasn't got the required permission
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.CALL_PHONE},10);  //request specific permission from user
+            return;
+        }else {     //have got permission
+            try{
+                startActivity(callIntent);  //call activity and make phone call
+            }
+            catch (android.content.ActivityNotFoundException ex){
+                Toast.makeText(getApplicationContext(),"No se puede llamar",Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
 }
