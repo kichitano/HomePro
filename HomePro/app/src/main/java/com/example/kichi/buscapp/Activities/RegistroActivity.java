@@ -144,9 +144,10 @@ public class RegistroActivity extends AppCompatActivity implements View.OnClickL
                 PopupElegirEspecialidad(view);
                 break;
             case R.id.btngetlocation:
-                //FALTA PROGRAMAR LO DE MAPA
-
+                Bundle args = new Bundle();
+                args.putInt("codigo",0);
                 Intent intent = new Intent(this,MapsActivity.class);
+                intent.putExtras(args);
                 startActivityForResult(intent,request_code);
         }
     }

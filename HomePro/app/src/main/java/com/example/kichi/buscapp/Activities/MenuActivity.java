@@ -45,6 +45,11 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
     int act = 0;
     SearchView buscador;
     EditText buscar;
+    String emailU;
+    String nombreU;
+    String apellidoU;
+    String fotoU;
+    String direccionU;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +63,16 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        Intent intent = getIntent();
+        Bundle bundle = intent.getExtras();
+
+        emailU = bundle.getString("emailU","");
+        nombreU = bundle.getString("nombreU","");
+        apellidoU = bundle.getString("apellidoU","");
+        fotoU = bundle.getString("fotoU","");
+        direccionU = bundle.getString("direccionU","");
+
 
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -77,6 +92,14 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
                             showProgress(true);
                             Bundle args = new Bundle();
                             args.putInt("visualiza", 1);
+
+                            args.putString("emailU",emailU);
+                            args.putString("nombreU",nombreU);
+                            args.putString("apellidoU",apellidoU);
+                            args.putString("fotoU",fotoU);
+                            args.putString("direccionU",direccionU);
+
+
 
                             //Una vez haz creado tu instancia de TestFragment y colocado el Bundle entre sus argumentos, usas el FragmentManager para iniciarla desde tu segunda actividad.
                             FragmentManager fragmentManager = getSupportFragmentManager();
@@ -111,6 +134,13 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
 
         Bundle args = new Bundle();
         args.putInt("visualiza", 0);
+
+        args.putString("emailU",emailU);
+        args.putString("nombreU",nombreU);
+        args.putString("apellidoU",apellidoU);
+        args.putString("fotoU",fotoU);
+        args.putString("direccionU",direccionU);
+
         FragmentManager fragmentManager  = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         EspecialidadFragment fragment = new EspecialidadFragment();
@@ -230,21 +260,21 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
         Intent intent = getIntent();                                            //Obtenemos el intent
         Bundle extras = intent.getExtras();                                     //Obtenemos el conjunto de extras
 
-        String email = extras.getString("Email");                             //Obtenemos el extra numero
-        String nombre = extras.getString("Nombre");                             //Obtenemos el extra numero
-        String apellido = extras.getString("Apellido");                         //Obtenemos el extra textoAzar
-        String foto = extras.getString("Foto");
-        String direccionP =  extras.getString("Direccion");
+        emailU = extras.getString("emailU");                             //Obtenemos el extra numero
+        nombreU = extras.getString("nombreU");                             //Obtenemos el extra numero
+        apellidoU = extras.getString("apellidoU");                         //Obtenemos el extra textoAzar
+        fotoU = extras.getString("fotoU");
+        direccionU =  extras.getString("direccionU");
 
-        byte[] decodedString = Base64.decode(foto,Base64.DEFAULT);
+        byte[] decodedString = Base64.decode(fotoU,Base64.DEFAULT);
         Bitmap decodedBitmap = BitmapFactory.decodeByteArray(decodedString,0,decodedString.length);
 
         TextView textView = (TextView)findViewById(R.id.textView);                //Buscamos el TextView por id del la caja de texto al azar
         TextView textView2 = (TextView)findViewById(R.id.textView2);              //Buscamos el TextView por id de la caja de texto de numero
         ImageView imageView = (ImageView)findViewById(R.id.imageView);
 
-        textView.setText(email);                                              //Seteamos el email
-        textView2.setText(nombre+ " " + apellido);                            //Seteamos los datos
+        textView.setText(emailU);                                              //Seteamos el email
+        textView2.setText(nombreU+ " " + apellidoU);                            //Seteamos los datos
         imageView.setImageBitmap(decodedBitmap);
 
         getMenuInflater().inflate(R.menu.menu, menu);

@@ -36,6 +36,11 @@ public class EspecialidadFragment extends Fragment{
     ArrayList<String> listaEspecialidad = null;
     private View view;
     private StaggeredGridLayoutManager mLayoutManager;
+    String emailU;
+    String nombreU;
+    String apellidoU;
+    String fotoU;
+    String direccionU;
 
     public EspecialidadFragment() {
         // Required empty public constructor
@@ -49,6 +54,13 @@ public class EspecialidadFragment extends Fragment{
 
         view = inflater.inflate(R.layout.fragment_especialidad, container, false);
 
+        final Bundle bundle = this.getArguments();
+
+        emailU = bundle.getString("emailU","");
+        nombreU = bundle.getString("nombreU","");
+        apellidoU = bundle.getString("apellidoU","");
+        fotoU = bundle.getString("fotoU","");
+        direccionU = bundle.getString("direccionU","");
 
         negociosEspecialidad = new ClsNegociosEspecialidad();
         listaEspecialidad = new ArrayList<>();
@@ -92,6 +104,12 @@ public class EspecialidadFragment extends Fragment{
                         args.putInt("idEspecialidad", idEspecialidad);
                         fragment.setArguments(args);
 
+                        args.putString("emailU",emailU);
+                        args.putString("nombreU",nombreU);
+                        args.putString("apellidoU",apellidoU);
+                        args.putString("fotoU",fotoU);
+                        args.putString("direccionU",direccionU);
+
                         transaction.replace(R.id.contenedor,fragment);
                         transaction.addToBackStack(null);
 
@@ -103,57 +121,6 @@ public class EspecialidadFragment extends Fragment{
                 })
         );
 
-        //getActivity().getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.);
-
         return view;
     }
-
-
-    /*public boolean OnCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_buscar, menu);
-        MenuItem item = menu.findItem(R.id.buscar);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
-
-        searchView.setOnQueryTextListener(this);
-
-        return true;
-    }
-
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String newText) {
-
-        try {
-
-            ArrayList<String> listaFiltrada = filter(listaEspecialidad, newText);
-
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
-        return false;
-    }
-
-    private ArrayList<String> filter(ArrayList<String> lista,String texto){
-
-        try {
-
-            texto = texto.toLowerCase();
-
-            for (int o = 0; o <= listaEspecialidad.size() - 2; o += 2){
-                String Nombre =  listaEspecialidad.get(o + 1);
-
-                if (Nombre.contains(texto)){
-                    listaEspecialidad.add(Nombre);
-                }
-            }
-
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }*/
 }

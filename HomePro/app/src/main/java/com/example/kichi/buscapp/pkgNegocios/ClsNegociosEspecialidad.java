@@ -63,7 +63,7 @@ public class ClsNegociosEspecialidad {
         con = new ClsConexion();
         Connection connection = con.ConnectionHelper();
         PreparedStatement preparedStatement = connection.prepareStatement("select email_persona_especialidad_persona,nombre_persona,apellido_persona,\n" +
-                "telefono_persona,lat_persona,lng_persona,,foto_persona \n" +
+                "telefono_persona,lat_persona,lng_persona,foto_persona \n" +
                 "from (select email_persona_especialidad_persona from tbl_especialidad_persona group by email_persona_especialidad_persona) esp_persona \n" +
                 "inner join tbl_persona on email_persona = esp_persona.email_persona_especialidad_persona");
         ResultSet rs = preparedStatement.executeQuery();

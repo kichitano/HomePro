@@ -168,11 +168,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 if( v != null) v.setGravity(Gravity.CENTER);
                 intent = new Intent(LoginActivity.this,MenuActivity.class);
                 bundle = new Bundle();
-                bundle.putString("Nombre",entidadPersona.getNombre_persona());
-                bundle.putString("Apellido",entidadPersona.getApellido_persona());
-                bundle.putString("Email",entidadPersona.getEmail_persona());
-                bundle.putString("Foto",entidadPersona.getFoto_persona());
-                bundle.putString("Direccion",entidadPersona.getDireccion_persona());
+
+                bundle.putString("emailU",entidadPersona.getEmail_persona());
+                bundle.putString("nombreU",entidadPersona.getNombre_persona());
+                bundle.putString("apellidoU",entidadPersona.getApellido_persona());
+                bundle.putString("fotoU",entidadPersona.getFoto_persona());
+                bundle.putString("direccionU",entidadPersona.getDireccion_persona());
 
                 intent.putExtras(bundle);
                 startActivity(intent);

@@ -32,6 +32,11 @@ public class ProfesionalesFragment extends Fragment {
     ClsNegociosEspecialidad negociosEspecialidad;
     ArrayList<String> listaProfesionales;
     private View view;
+    String emailU;
+    String nombreU;
+    String apellidoU;
+    String fotoU;
+    String direccionU;
 
     public ProfesionalesFragment(){
 
@@ -47,6 +52,12 @@ public class ProfesionalesFragment extends Fragment {
         final Bundle bundle = this.getArguments();
         int idEspecialidad = bundle.getInt("idEspecialidad", 0);
         int Visualiza = bundle.getInt("visualiza",0);
+
+        emailU = bundle.getString("emailU","");
+        nombreU = bundle.getString("nombreU","");
+        apellidoU = bundle.getString("apellidoU","");
+        fotoU = bundle.getString("fotoU","");
+        direccionU = bundle.getString("direccionU","");
 
 
         negociosEspecialidad = new ClsNegociosEspecialidad();
@@ -107,6 +118,12 @@ public class ProfesionalesFragment extends Fragment {
                         args.putString("telefono_profesional",telefono_profesional);
                         args.putString("direccion_profesional",direccion_profesional);
                         args.putString("foto_texto",foto_texto);
+
+                        args.putString("emailU",emailU);
+                        args.putString("nombreU",nombreU);
+                        args.putString("apellidoU",apellidoU);
+                        args.putString("fotoU",fotoU);
+                        args.putString("direccionU",direccionU);
 
                         Intent intent = new Intent(getActivity(), ProfesionalActivity.class);
 

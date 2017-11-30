@@ -41,8 +41,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     Location mLastLocation;
     Marker mCurrLocationMarker;
     int CONT = 0;
+    int codigo;
     double lat,lng;
     Button setPosicion;
+
+    String telefonoP;
+    String latP;
+    String lngP;
+    String datosP;
+
+    String latU;
+    String lngU;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -53,13 +62,31 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapFrag = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFrag.getMapAsync(this);
 
-        setPosicion=(Button)findViewById(R.id.btnSetLatLng);
-        setPosicion.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                GuardarUbicacion(v);
-            }
-        });
+        Intent intent = getIntent();
+        Bundle extras = intent.getExtras();
+
+        codigo = extras.getInt("codigo",0);
+        if(codigo==1){
+            CONT = 1;
+            latP = extras.getString("latP", "");
+            lngP = extras.getString("lngP", "");
+            latU = extras.getString("latU", "");
+            lngU = extras.getString("lngU", "");
+            datosP = extras.getString("datosP", "");
+            telefonoP = extras.getString("telefonoP", "");
+            CONT = 1;
+            setPosicion =(Button)findViewById(R.id.btnSetLatLng);
+            setPosicion.setVisibility(View.GONE);
+        }else{
+            CONT = 0;
+            setPosicion=(Button)findViewById(R.id.btnSetLatLng);
+            setPosicion.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    GuardarUbicacion(v);
+                }
+            });
+        }
     }
 
     @Override
@@ -86,27 +113,29 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     == PackageManager.PERMISSION_GRANTED) {
                 //Location Permission already granted
                 buildGoogleApiClient();
-                mGoogleMap.setMyLocationEnabled(true);
                 UiSettings uiSettings = mGoogleMap.getUiSettings();
                 uiSettings.setZoomControlsEnabled(true);
-                uiSettings.setMapToolbarEnabled(false);
+                if(CONT == 0) {
+                    mGoogleMap.setMyLocationEnabled(true);
+                    uiSettings.setMapToolbarEnabled(false);
+                    mGoogleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+                        @Override
+                        public void onMapClick(LatLng latLng) {
+                            if (mCurrLocationMarker != null) {
+                                mCurrLocationMarker.remove();
+                                mCurrLocationMarker = googleMap.addMarker(new MarkerOptions()
+                                        .position(latLng)
+                                        .draggable(true)
+                                        .title("Ubicacion nueva"));
 
-                mGoogleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-                    @Override
-                    public void onMapClick(LatLng latLng) {
-                        if (mCurrLocationMarker != null) {
-                            mCurrLocationMarker.remove();
-                            mCurrLocationMarker = googleMap.addMarker(new MarkerOptions()
-                                    .position(latLng)
-                                    .title("Ubicacion nueva"));
+                                lat = mCurrLocationMarker.getPosition().latitude;
+                                lng = mCurrLocationMarker.getPosition().longitude;
 
-                            lat =  mCurrLocationMarker.getPosition().latitude;
-                            lng = mCurrLocationMarker.getPosition().longitude;
-
-                            mCurrLocationMarker.showInfoWindow();
+                                mCurrLocationMarker.showInfoWindow();
+                            }
                         }
-                    }
-                });
+                    });
+                }
 
             } else {
                 //Request Location Permission
@@ -152,7 +181,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onLocationChanged(Location location)
     {
         if (CONT == 0) {
-
             mLastLocation = location;
             if (mCurrLocationMarker != null) {
                 mCurrLocationMarker.remove();
@@ -163,6 +191,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             MarkerOptions markerOptions = new MarkerOptions();
             markerOptions.position(latLng);
             markerOptions.title("Mi ubicacion actual");
+            markerOptions.draggable(true);
             markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
             mCurrLocationMarker = mGoogleMap.addMarker(markerOptions);
             //move map camera
@@ -172,6 +201,28 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             lat = location.getLongitude();
 
             CONT = 1;
+        }else{
+            LatLng latLngU = new LatLng(Double.parseDouble(latU),Double.parseDouble(lngU));
+            MarkerOptions markerU = new MarkerOptions();
+
+            markerU.position(latLngU);
+            markerU.title("Yo :)");
+            markerU.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+            mCurrLocationMarker = mGoogleMap.addMarker(markerU);
+
+            LatLng latLngP = new LatLng(Double.parseDouble(latP),Double.parseDouble(lngP));
+            MarkerOptions markerP = new MarkerOptions();
+
+            markerP.position(latLngP);
+            markerP.title(datosP);
+            markerP.snippet("Llamar a "+telefonoP);
+
+            markerP.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+            mCurrLocationMarker = mGoogleMap.addMarker(markerP);
+
+            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLngU,18));
+
+
         }
 
     }
@@ -250,11 +301,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     public void GuardarUbicacion(View view) {
-
         String latlng = String.valueOf(lat) + "@" + String.valueOf(lng) ;
         Intent data = new Intent();
         data.setData(Uri.parse(latlng));
         setResult(RESULT_OK, data);
         finish();
     }
+
 }

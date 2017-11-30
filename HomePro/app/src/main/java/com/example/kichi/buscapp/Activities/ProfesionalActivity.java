@@ -19,10 +19,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.kichi.buscapp.R;
+import com.example.kichi.buscapp.pkgEntidad.ClsEntidadPersona;
 
-public class ProfesionalActivity extends AppCompatActivity {
+public class ProfesionalActivity extends AppCompatActivity implements View.OnClickListener {
 
-    String telefono;
+        String telefonoP;
+        String direccionP;
+        String emailP;
+        String nombreapellidoP;
+        String fotoP;
+
+        String emailU;
+        String nombreU;
+        String apellidoU;
+        String fotoU;
+        String direccionU;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,45 +42,67 @@ public class ProfesionalActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
-
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
 
-        String email = extras.getString("email_profesional");
-        String nombreapellido = extras.getString("nombre_apellido_profesional");
-        telefono = extras.getString("telefono_profesional");
-        String direccion = extras.getString("direccion_profesional");
-        String foto = extras.getString("foto_texto");
+        emailP = extras.getString("email_profesional");
+        nombreapellidoP = extras.getString("nombre_apellido_profesional");
+        telefonoP = extras.getString("telefono_profesional");
+        direccionP = extras.getString("direccion_profesional");
+        fotoP = extras.getString("foto_texto");
 
+        emailU = extras.getString("emailU","");
+        nombreU = extras.getString("nombreU","");
+        apellidoU = extras.getString("apellidoU","");
+        fotoU = extras.getString("fotoU","");
+        direccionU = extras.getString("direccionU","");
 
-        byte[] decodedString = Base64.decode(foto, Base64.DEFAULT);
+        byte[] decodedString = Base64.decode(fotoP, Base64.DEFAULT);
         Bitmap decodedBitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
 
-        TextView txtemail = (TextView) findViewById(R.id.emailProfesional);
-        //TextView txtdatos = (TextView) findViewById(R.id.nombreapellidoProfesional);
         Button btntelefono = (Button) findViewById(R.id.telefonoProfesional);
-        TextView txtdireccion = (TextView) findViewById(R.id.direccionProfesional);
+        Button btndireccionPro = (Button) findViewById(R.id.btndireccionProfesional);
         ImageView imgfoto = (ImageView) findViewById(R.id.imagenProfesional);
         FloatingActionButton fabmensaje = (FloatingActionButton)findViewById(R.id.fabmessage);
-
+        //TextView txtdatos = (TextView) findViewById(R.id.nombreapellidoProfesional);
+        TextView txtemail = (TextView) findViewById(R.id.emailProfesional);
+        TextView txtdireccion = (TextView) findViewById(R.id.direccionProfesional);
         TextView headscrooling = (TextView)findViewById(R.id.head_scrooling);
 
-        headscrooling.setText(nombreapellido);
+        headscrooling.setText(nombreapellidoP);
+        txtemail.setText(emailP);
 
-        txtemail.setText(email);
         //txtdatos.setText(nombreapellido);
 
-        btntelefono.setText("Llamar a "+telefono);
-        txtdireccion.setText(direccion);
+        btntelefono.setText("Llamar a "+telefonoP);
+        txtdireccion.setText(direccionP);
         imgfoto.setImageBitmap(decodedBitmap);
 
-        btntelefono.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        fabmensaje.setOnClickListener(this);
+        btntelefono.setOnClickListener(this);
+        btndireccionPro.setOnClickListener(this);
+    }
 
+    @Override
+    public void onClick(View view) {
+
+        switch (view.getId()) {
+            case R.id.fabmessage:
+                String message = "Hola, me interesa los servicios que ofreces " + "\ud83d\ude0f" + "\ud83d\ude0f";
+                String prefijo="51";
+
+                Intent sendIntent = new Intent("android.intent.action.MAIN");
+                sendIntent.putExtra("jid", prefijo+telefonoP + "@s.whatsapp.net");
+
+                sendIntent.putExtra(Intent.EXTRA_TEXT, message);
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.setPackage("com.whatsapp");
+                sendIntent.setType("text/plain");
+                startActivity(sendIntent);
+                break;
+            case R.id.telefonoProfesional:
                 Intent callIntent = new Intent(Intent.ACTION_CALL); //use ACTION_CALL class
-                callIntent.setData(Uri.parse("tel:" + telefono));    //this is the phone number calling
+                callIntent.setData(Uri.parse("tel:" + telefonoP));    //this is the phone number calling
                 //check permission
                 //If the device is running Android 6.0 (API level 23) and the app's targetSdkVersion is 23 or higher,
                 //the system asks the user to grant approval.
@@ -85,28 +118,29 @@ public class ProfesionalActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(),"No se puede llamar",Toast.LENGTH_SHORT).show();
                     }
                 }
-            }
-        });
+                break;
+            case R.id.btndireccionProfesional:
 
-        fabmensaje.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+                Bundle args = new Bundle();
 
-                String message = "Hola, me interesa los servicios que ofreces " + "\ud83d\ude0f" + "\ud83d\ude0f";
-                String prefijo="51";
+                String latlngP[] = direccionP.split("@");
+                String latlngU[] = direccionU.split("@");
 
-                Intent sendIntent = new Intent("android.intent.action.MAIN");
-                sendIntent.putExtra("jid", prefijo+telefono + "@s.whatsapp.net");
+                args.putInt("codigo",1);
+                args.putString("latP",latlngP[0]);
+                args.putString("lngP",latlngP[1]);
+                args.putString("latU",latlngU[0]);
+                args.putString("lngU",latlngU[1]);
 
-                sendIntent.putExtra(Intent.EXTRA_TEXT, message);
-                sendIntent.setAction(Intent.ACTION_SEND);
-                sendIntent.setPackage("com.whatsapp");
-                sendIntent.setType("text/plain");
-                startActivity(sendIntent);
+                args.putString("datosP",nombreapellidoP);
+                args.putString("telefonoP",telefonoP);
 
+                Intent intent = new Intent(this,MapsActivity.class);
+                intent.putExtras(args);
 
+                startActivityForResult(intent,50);
 
-            }
-        });
+                break;
+        }
     }
 }
