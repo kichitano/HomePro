@@ -70,13 +70,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     double lat,lng;
     Button setPosicion;
 
-    String telefonoP;
-    String latP;
-    String lngP;
-    String datosP;
-
-    String latU;
-    String lngU;
+    String datosP,telefonoP,latP,lngP;
+    String emailU,nombreU,apellidoU,fotoU,latU,lngU;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -102,6 +97,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             CONT = 1;
             setPosicion =(Button)findViewById(R.id.btnSetLatLng);
             setPosicion.setVisibility(View.GONE);
+        }else if(codigo==2){
+            CONT = 3;
+            emailU = extras.getString("emailU","");
+            nombreU = extras.getString("nombreU","");
+            apellidoU = extras.getString("apellidoU","");
+            fotoU = extras.getString("fotoU","");
+            latU = extras.getString("latU", "");
+            lngU = extras.getString("lngU", "");
+
         }else{
             CONT = 0;
             setPosicion=(Button)findViewById(R.id.btnSetLatLng);
@@ -160,7 +164,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                             }
                         }
                     });
-                }else {
+                }else if(CONT==1){
 
                     LatLng latLngU = new LatLng(Double.parseDouble(latU),Double.parseDouble(lngU));
                     MarkerOptions markerU = new MarkerOptions();
@@ -182,17 +186,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                     mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLngU,18));
 
-                    //LINEA RECTA EN MAPA
-
-
                     LatLng origin = latLngU;
                     LatLng dest = latLngP;
                     String url = getDirectionsUrl(origin, dest);
                     DownloadTask downloadTask = new DownloadTask();
                     downloadTask.execute(url);
-
-
-                    //LINEA RECTA EN MAPA
 
                     mGoogleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                         @Override
@@ -203,6 +201,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                             return false;
                         }
                     });
+                }else if(CONT==3){
+
                 }
 
             } else {

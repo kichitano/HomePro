@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
+import android.hardware.SensorListener;
 import android.hardware.SensorManager;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -42,7 +43,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MenuActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class MenuActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private View mMenuFormView;
     private View mProgressView;
@@ -53,13 +54,10 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
     String fotoU;
     String direccionU;
     ArrayList<String> listaEspecialidad = null;
-    private SensorManager mSensorManager;
-    private float mAccel; // acceleration apart from gravity
-    private float mAccelCurrent; // current acceleration including gravity
-    private float mAccelLast; // last acceleration including gravity
-
-
-
+    private SensorManager sm;
+    private float acelVal; // current acceleration including gravity
+    private float acelLast; // last acceleration including gravity
+    private float shake; // acceleration apart from gravity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +68,12 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
         // Quitar Action Bar
 
         setContentView(R.layout.activity_menu);
+
+        sm = (SensorManager) getSystemService(this.SENSOR_SERVICE);
+        sm.registerListener(sensorEventListener, sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+        shake = 0.00f;
+        acelVal = SensorManager.GRAVITY_EARTH;
+        acelLast = SensorManager.GRAVITY_EARTH;
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -164,19 +168,47 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
         CargarEspecialidades cargarEspecialidades = clase.new CargarEspecialidades();
         cargarEspecialidades.execute();
 
-        /* do this in onCreate */
-        mSensorManager = (SensorManager) getSystemService(this.SENSOR_SERVICE);
-        mSensorManager.registerListener(mSensorListener, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
-        mAccel = 0.00f;
-        mAccelCurrent = SensorManager.GRAVITY_EARTH;
-        mAccelLast = SensorManager.GRAVITY_EARTH;
+    }
 
-        if (mAccel > 12) {
-            Toast toast = Toast.makeText(getApplicationContext(), "Device has shaken.", Toast.LENGTH_LONG);
-            toast.show();
+    private final SensorEventListener sensorEventListener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            float x = event.values[0];
+            float y = event.values[1];
+            float z = event.values[2];
+
+            acelLast = acelVal;
+            acelVal = (float) Math.sqrt((double) (x*x + y*y + z*z));
+            float delta = acelVal - acelLast;
+            shake = shake * 0.9f + delta;
+
+            if(shake > 15){
+
+                Bundle args = new Bundle();
+                String latlngU[] = direccionU.split("@");
+
+                args.putInt("codigo",2);
+
+                args.putString("emailU",emailU);
+                args.putString("nombreU",nombreU);
+                args.putString("apellidoU",apellidoU);
+                args.putString("latU",latlngU[0]);
+                args.putString("lngU",latlngU[1]);
+                args.putString("fotoU",fotoU);
+
+                Intent intent = new Intent(getApplicationContext(),MapsActivity.class);
+                intent.putExtras(args);
+
+                startActivityForResult(intent,55);
+
+            }
         }
 
-    }
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+        }
+    };
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
@@ -250,10 +282,6 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-    //EspecialidadFragment especialidadFragment = (EspecialidadFragment)getSupportFragmentManager().findFragmentByTag("EspecialidadFragment");
-    //ProfesionalesFragment profesionalesFragment = (ProfesionalesFragment)getSupportFragmentManager().findFragmentByTag("ProfesionalesFragment");
-
-
     public class CargarEspecialidades extends AsyncTask<Void, Void, Boolean> {
 
         @Override
@@ -313,32 +341,5 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-    private final SensorEventListener mSensorListener = new SensorEventListener() {
-
-        public void onSensorChanged(SensorEvent se) {
-            float x = se.values[0];
-            float y = se.values[1];
-            float z = se.values[2];
-            mAccelLast = mAccelCurrent;
-            mAccelCurrent = (float) Math.sqrt((double) (x*x + y*y + z*z));
-            float delta = mAccelCurrent - mAccelLast;
-            mAccel = mAccel * 0.9f + delta; // perform low-cut filter
-        }
-
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        }
-    };
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mSensorManager.registerListener(mSensorListener, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
-    }
-
-    @Override
-    protected void onPause() {
-        mSensorManager.unregisterListener(mSensorListener);
-        super.onPause();
-    }
 
 }
