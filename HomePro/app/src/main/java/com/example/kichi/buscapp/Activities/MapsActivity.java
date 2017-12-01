@@ -8,16 +8,19 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.kichi.buscapp.R;
+import com.example.kichi.buscapp.pkgNegociosParticulares.DirectionsJSONParser;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -29,13 +32,28 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Dash;
+import com.google.android.gms.maps.model.Dot;
+import com.google.android.gms.maps.model.Gap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PatternItem;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener,LocationListener {
 
@@ -44,6 +62,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     LocationRequest mLocationRequest;
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
+    ArrayList<LatLng> markerPoints;
     Marker mCurrLocationMarker;
     Marker locU,locP;
     int CONT = 0;
@@ -147,7 +166,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     MarkerOptions markerU = new MarkerOptions();
                     markerU.position(latLngU);
                     markerU.title("Yo :)");
-                    markerU.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+                    markerU.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
                     locU = mGoogleMap.addMarker(markerU);
                     locU.showInfoWindow();
 
@@ -156,7 +175,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     markerP.position(latLngP);
                     markerP.title(datosP);
                     markerP.snippet("Llamar a "+telefonoP);
-                    markerP.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                    markerP.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
                     locP = mGoogleMap.addMarker(markerP);
                     locP.showInfoWindow();
                     locP.setTag(99);
@@ -165,19 +184,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                     //LINEA RECTA EN MAPA
 
-                    ArrayList<LatLng> points; //added
-                    Polyline line; //added
-                    points = new ArrayList<LatLng>(); //added
 
-                    points.add(latLngU); //added
-                    points.add(latLngP); //added
+                    LatLng origin = latLngU;
+                    LatLng dest = latLngP;
+                    String url = getDirectionsUrl(origin, dest);
+                    DownloadTask downloadTask = new DownloadTask();
+                    downloadTask.execute(url);
 
-                    PolylineOptions options = new PolylineOptions().width(5).color(Color.BLUE).geodesic(true);
-                    for (int i = 0; i < points.size(); i++) {
-                        LatLng point = points.get(i);
-                        options.add(point);
-                    }
-                    mGoogleMap.addPolyline(options);
 
                     //LINEA RECTA EN MAPA
 
@@ -201,6 +214,160 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             buildGoogleApiClient();
             mGoogleMap.setMyLocationEnabled(true);
 
+        }
+    }
+
+    private String getDirectionsUrl(LatLng origin,LatLng dest){
+
+        // Origin of route
+        String str_origin = "origin="+origin.latitude+","+origin.longitude;
+
+        // Destination of route
+        String str_dest = "destination="+dest.latitude+","+dest.longitude;
+
+        // Sensor enabled
+        String sensor = "sensor=false";
+
+        // Building the parameters to the web service
+        String parameters = str_origin+"&"+str_dest+"&"+sensor;
+
+        // Output format
+        String output = "json";
+
+        String url = "https://maps.googleapis.com/maps/api/directions/"+output+"?"+parameters;
+
+        return url;
+    }
+
+    private String downloadUrl(String strUrl) throws IOException {
+        String data = "";
+        InputStream iStream = null;
+        HttpURLConnection urlConnection = null;
+        try{
+            URL url = new URL(strUrl);
+
+            urlConnection = (HttpURLConnection) url.openConnection();
+
+            // Connecting to url
+            urlConnection.connect();
+
+            // Reading data from url
+            iStream = urlConnection.getInputStream();
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
+
+            StringBuffer sb  = new StringBuffer();
+
+            String line = "";
+            while( ( line = br.readLine())  != null){
+                sb.append(line);
+            }
+
+            data = sb.toString();
+
+            br.close();
+
+        }catch(Exception e){
+            Log.d("Exception downloading", e.toString());
+        }finally{
+            iStream.close();
+            urlConnection.disconnect();
+        }
+        return data;
+    }
+
+    private class DownloadTask extends AsyncTask<String, Void, String> {
+
+        // Downloading data in non-ui thread
+        @Override
+        protected String doInBackground(String... url) {
+
+            // For storing data from web service
+            String data = "";
+
+            try{
+                // Fetching the data from web service
+                data = downloadUrl(url[0]);
+            }catch(Exception e){
+                Log.d("Background Task",e.toString());
+            }
+            return data;
+        }
+
+        // Executes in UI thread, after the execution of
+        // doInBackground()
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            ParserTask parserTask = new ParserTask();
+
+            // Invokes the thread for parsing the JSON data
+            parserTask.execute(result);
+        }
+    }
+
+    private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String,String>>>> {
+
+        @Override
+        protected List<List<HashMap<String, String>>> doInBackground(String... jsonData) {
+
+            JSONObject jObject;
+            List<List<HashMap<String, String>>> routes = null;
+
+            try{
+                jObject = new JSONObject(jsonData[0]);
+                DirectionsJSONParser parser = new DirectionsJSONParser();
+
+                // Starts parsing data
+                routes = parser.parse(jObject);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            return routes;
+        }
+
+        @Override
+        protected void onPostExecute(List<List<HashMap<String, String>>> result) {
+            ArrayList<LatLng> points = null;
+            PolylineOptions lineOptions = null;
+            MarkerOptions markerOptions = new MarkerOptions();
+
+            // Traversing through all the routes
+            for(int i=0;i<result.size();i++){
+                points = new ArrayList<LatLng>();
+                lineOptions = new PolylineOptions();
+
+                // Fetching i-th route
+                List<HashMap<String, String>> path = result.get(i);
+
+                // Fetching all the points in i-th route
+                for(int j=0;j<path.size();j++){
+
+                    HashMap<String, String> point = path.get(j);
+                    double lat = Double.parseDouble(point.get("lat"));
+                    double lng = Double.parseDouble(point.get("lng"));
+                    LatLng position = new LatLng(lat, lng);
+                    points.add(position);
+
+                }
+
+                // añadiendo patrones de punteo
+                int PATTERN_DASH_LENGTH_PX = 25;
+                int PATTERN_GAP_LENGTH_PX = 25;
+                PatternItem DOT = new Dot();
+                PatternItem DASH = new Dash(PATTERN_DASH_LENGTH_PX);
+                PatternItem GAP = new Gap(PATTERN_GAP_LENGTH_PX);
+                List<PatternItem> PATTERN_POLYGON_ALPHA = Arrays.asList(GAP, DASH);
+
+                lineOptions.pattern(PATTERN_POLYGON_ALPHA);
+                lineOptions.addAll(points);
+                lineOptions.width(14);
+                lineOptions.color(Color.parseColor("#009688"));
+            }
+
+            // Drawing polyline in the Google Map for the i-th route
+            mGoogleMap.addPolyline(lineOptions);
         }
     }
 
@@ -297,8 +464,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode,String permissions[], int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_LOCATION: {
                 // If request is cancelled, the result arrays are empty.
@@ -334,7 +500,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public void GuardarUbicacion(View view) {
         String latlng = String.valueOf(lat) + "@" + String.valueOf(lng) ;
-        Toast.makeText(this,lat + " " + lng,Toast.LENGTH_SHORT).show();
         Intent data = new Intent();
         data.setData(Uri.parse(latlng));
         setResult(RESULT_OK, data);

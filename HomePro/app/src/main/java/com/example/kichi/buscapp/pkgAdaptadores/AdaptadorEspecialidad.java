@@ -8,6 +8,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.example.kichi.buscapp.R;
@@ -27,11 +29,12 @@ public class AdaptadorEspecialidad extends RecyclerView.Adapter<AdaptadorEspecia
     private Context context;
 
 
-    public static class EspecialidadViewHolder extends RecyclerView.ViewHolder {
+    public static class EspecialidadViewHolder extends RecyclerView.ViewHolder{
         // Campos respectivos de un item
         public TextView IdEspecialidad;
         public TextView descripcionEspecialidad;
         public ImageView imgEspecialidad;
+
 
         public EspecialidadViewHolder(View v) {
             super(v);
