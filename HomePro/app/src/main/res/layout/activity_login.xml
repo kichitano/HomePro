@@ -30,6 +30,7 @@
         android:layout_marginTop="70dp"
         app:srcCompat="@drawable/logo" />
 
+
     <RelativeLayout
         android:id="@+id/login_form"
         android:layout_width="match_parent"
@@ -48,6 +49,9 @@
         card_view:cardElevation="40dp"
         card_view:cardCornerRadius="25dp">
 
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
         <EditText
             android:id="@+id/TxtUsuario"
             android:layout_width="wrap_content"
@@ -64,9 +68,12 @@
             android:textColor="@android:color/background_dark"
             android:textColorHint="#9E9E9E"
             android:textColorLink="@android:color/background_dark"
-            android:text="kixi.13.7@gmail.com"
             />
+        </android.support.design.widget.TextInputLayout>
 
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
         <EditText
             android:id="@+id/TxtPassword"
             android:layout_width="wrap_content"
@@ -83,8 +90,8 @@
             android:textColor="@android:color/background_dark"
             android:textColorHint="#9E9E9E"
             android:textColorLink="@android:color/background_dark"
-            android:text="123456"
             />
+        </android.support.design.widget.TextInputLayout>
 
 
         <Button
@@ -100,7 +107,6 @@
             android:textColor="@android:color/background_light"
             android:textSize="14sp"
             android:textStyle="bold" />
-
 
     </android.support.v7.widget.CardView>
 

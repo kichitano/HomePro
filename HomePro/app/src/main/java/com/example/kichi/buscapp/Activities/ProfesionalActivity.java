@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -15,25 +16,37 @@ import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.kichi.buscapp.R;
+import com.example.kichi.buscapp.pkgAdaptadores.Adaptador;
+import com.example.kichi.buscapp.pkgEntidad.ClsEntidadComentario;
 import com.example.kichi.buscapp.pkgEntidad.ClsEntidadPersona;
+import com.example.kichi.buscapp.pkgNegocios.ClsNegocioComentario;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProfesionalActivity extends AppCompatActivity implements View.OnClickListener {
 
-        String telefonoP;
-        String direccionP;
-        String emailP;
-        String nombreapellidoP;
-        String fotoP;
+    String telefonoP;
+    String direccionP;
+    String emailP;
+    String nombreapellidoP;
+    String fotoP;
+    private ListView lista;
+    String emailU;
+    String nombreU;
+    String apellidoU;
+    String fotoU;
+    String direccionU;
 
-        String emailU;
-        String nombreU;
-        String apellidoU;
-        String fotoU;
-        String direccionU;
+    ClsNegocioComentario clsNegocioComentario;
+    ArrayList<ClsEntidadComentario> arrayListComentario;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +94,10 @@ public class ProfesionalActivity extends AppCompatActivity implements View.OnCli
         fabmensaje.setOnClickListener(this);
         btntelefono.setOnClickListener(this);
         btndireccionPro.setOnClickListener(this);
+
+        ProfesionalActivity clase = this;
+        CargarComentarios cargarComentarios = clase.new CargarComentarios();
+        cargarComentarios.execute();
     }
 
     @Override
@@ -141,6 +158,57 @@ public class ProfesionalActivity extends AppCompatActivity implements View.OnCli
                 startActivityForResult(intent,50);
 
                 break;
+        }
+    }
+
+
+    public class CargarComentarios extends AsyncTask<Void, Void, Boolean> {
+
+        @Override
+        protected void onPreExecute() {
+
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            // TODO: attempt authentication against a network service.
+            Boolean resp = false;
+
+            clsNegocioComentario = new ClsNegocioComentario();
+            try {
+                arrayListComentario =  new ArrayList<>(clsNegocioComentario.ConsultarComentario(emailP));
+                if(arrayListComentario.size() > 0){
+                    resp = true;
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return resp;
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            if(success) {
+
+                lista = (ListView)findViewById(R.id.lista_comentarios);
+                lista.setAdapter(new Adaptador(ProfesionalActivity.this,R.layout.fila_comentario, arrayListComentario) {
+                    @Override
+                    public void onEntrada(Object entrada, View view) {
+                        TextView comentario = (TextView)view.findViewById(R.id.comentario);
+                        comentario.setText(((ClsEntidadComentario)entrada).getComentario_persona());
+
+                        TextView emailComenta = (TextView)view.findViewById(R.id.email_comenta);
+                        emailComenta.setText(((ClsEntidadComentario)entrada).getEmail_persona_comentario());
+
+                        String foto = ((ClsEntidadComentario)entrada).getFoto_persona();
+                        byte[] decodedString = Base64.decode(foto,Base64.DEFAULT);
+                        Bitmap decodedBitmap = BitmapFactory.decodeByteArray(decodedString,0,decodedString.length);
+
+                        ImageView imagenComenta = (ImageView)view.findViewById(R.id.foto_comentario);
+                        imagenComenta.setImageBitmap(decodedBitmap);
+                    }
+                });
+            }
         }
     }
 }

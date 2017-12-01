@@ -52,6 +52,13 @@
             android:paddingBottom="20dp"
             android:text="Small Text"
             android:textAppearance="?android:attr/textAppearanceSmall" />
+        <RatingBar
+            android:id="@+id/ratingbarprofesionalcardview"
+            style="?android:attr/ratingBarStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/emailProfesional"
+            android:layout_alignParentStart="true" />
 
         <TextView
             android:id="@+id/telefonoProfesional"

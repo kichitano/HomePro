@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.example.kichi.buscapp.Activities.ProfesionalActivity;
 import com.example.kichi.buscapp.pkgEntidad.ClsEntidadEspecialidad;
 
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public abstract class Adaptador extends BaseAdapter{
     private int R_layout_IdView;
     private Context contexto;
 
-    public Adaptador(Context contexto, int R_layout_IdView, ArrayList<?> entradas) {
+    public Adaptador(ProfesionalActivity contexto, int R_layout_IdView, ArrayList<?> entradas) {
         super();
         this.contexto = contexto;
         this.entradas = entradas;
