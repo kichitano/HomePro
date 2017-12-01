@@ -200,6 +200,7 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
                 intent.putExtras(args);
 
                 startActivityForResult(intent,55);
+                sm.unregisterListener(this);
 
             }
         }
@@ -209,6 +210,15 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
 
         }
     };
+
+    @Override
+    protected void onResume(){
+        sm.registerListener(sensorEventListener, sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+        shake = 0.00f;
+        acelVal = SensorManager.GRAVITY_EARTH;
+        acelLast = SensorManager.GRAVITY_EARTH;
+        super.onResume();
+    }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {

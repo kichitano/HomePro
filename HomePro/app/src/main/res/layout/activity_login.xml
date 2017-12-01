@@ -19,8 +19,6 @@
         android:layout_centerHorizontal="true"
         android:visibility="gone" />
 
-
-
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"
@@ -29,7 +27,6 @@
         android:layout_alignParentTop="true"
         android:layout_marginTop="70dp"
         app:srcCompat="@drawable/logo" />
-
 
     <RelativeLayout
         android:id="@+id/login_form"
@@ -49,9 +46,6 @@
         card_view:cardElevation="40dp"
         card_view:cardCornerRadius="25dp">
 
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
         <EditText
             android:id="@+id/TxtUsuario"
             android:layout_width="wrap_content"
@@ -69,11 +63,7 @@
             android:textColorHint="#9E9E9E"
             android:textColorLink="@android:color/background_dark"
             />
-        </android.support.design.widget.TextInputLayout>
 
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
         <EditText
             android:id="@+id/TxtPassword"
             android:layout_width="wrap_content"
@@ -91,8 +81,6 @@
             android:textColorHint="#9E9E9E"
             android:textColorLink="@android:color/background_dark"
             />
-        </android.support.design.widget.TextInputLayout>
-
 
         <Button
             android:id="@+id/BtnLogin"

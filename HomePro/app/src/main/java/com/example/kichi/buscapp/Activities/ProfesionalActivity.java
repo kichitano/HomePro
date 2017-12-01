@@ -3,8 +3,10 @@ package com.example.kichi.buscapp.Activities;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -18,6 +20,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,6 +47,8 @@ public class ProfesionalActivity extends AppCompatActivity implements View.OnCli
     String apellidoU;
     String fotoU;
     String direccionU;
+    RatingBar ratingBar;
+    float valoracion;
 
     ClsNegocioComentario clsNegocioComentario;
     ArrayList<ClsEntidadComentario> arrayListComentario;
@@ -77,10 +82,10 @@ public class ProfesionalActivity extends AppCompatActivity implements View.OnCli
         Button btndireccionPro = (Button) findViewById(R.id.btndireccionProfesional);
         ImageView imgfoto = (ImageView) findViewById(R.id.imagenProfesional);
         FloatingActionButton fabmensaje = (FloatingActionButton)findViewById(R.id.fabmessage);
-        //TextView txtdatos = (TextView) findViewById(R.id.nombreapellidoProfesional);
         TextView txtemail = (TextView) findViewById(R.id.emailProfesional);
         TextView txtdireccion = (TextView) findViewById(R.id.direccionProfesional);
         TextView headscrooling = (TextView)findViewById(R.id.head_scrooling);
+        ratingBar = (RatingBar)findViewById(R.id.ratingbarprofesional);
 
         headscrooling.setText(nombreapellidoP);
         txtemail.setText(emailP);
@@ -97,6 +102,7 @@ public class ProfesionalActivity extends AppCompatActivity implements View.OnCli
 
         ProfesionalActivity clase = this;
         CargarComentarios cargarComentarios = clase.new CargarComentarios();
+
         cargarComentarios.execute();
     }
 
@@ -206,8 +212,16 @@ public class ProfesionalActivity extends AppCompatActivity implements View.OnCli
 
                         ImageView imagenComenta = (ImageView)view.findViewById(R.id.foto_comentario);
                         imagenComenta.setImageBitmap(decodedBitmap);
+
+                        valoracion = valoracion + Float.parseFloat(((ClsEntidadComentario)entrada).getRating_especialista());
                     }
                 });
+
+                valoracion = valoracion / arrayListComentario.size();
+                ratingBar.setProgressTintList(ColorStateList.valueOf(Color.YELLOW));
+                ratingBar.setRating(valoracion);
+
+                valoracion=0;
             }
         }
     }
