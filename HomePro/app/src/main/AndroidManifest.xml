@@ -18,6 +18,10 @@
         android:supportsRtl="true"
         android:theme="@style/Login"
         android:windowSoftInputMode="stateHidden">
+        <meta-data
+            android:name="android.app.searchable"
+            android:resource="@xml/searchable">
+        </meta-data>
         <activity android:name=".Activities.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -31,10 +35,6 @@
             android:name=".Activities.MenuActivity"
             android:label="@string/title_activity_menu2"
             android:theme="@style/Login">
-            <meta-data
-                android:name="android.app.searchable"
-                android:resource="@xml/searchable">
-            </meta-data>
         </activity>
 
         <activity

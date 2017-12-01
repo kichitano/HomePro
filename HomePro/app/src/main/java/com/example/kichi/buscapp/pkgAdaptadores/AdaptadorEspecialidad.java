@@ -27,6 +27,7 @@ public class AdaptadorEspecialidad extends RecyclerView.Adapter<AdaptadorEspecia
 
     private List<ClsEntidadEspecialidad> items;
     private Context context;
+    private ArrayList<ClsEntidadEspecialidad> listaEspecialidades;
 
 
     public static class EspecialidadViewHolder extends RecyclerView.ViewHolder{
@@ -75,5 +76,10 @@ public class AdaptadorEspecialidad extends RecyclerView.Adapter<AdaptadorEspecia
         viewHolder.imgEspecialidad.setImageDrawable(drawable);
     }
 
+    public void setFilter(ArrayList<ClsEntidadEspecialidad> listaEspecialidades){
+        this.listaEspecialidades = new ArrayList<>();
+        this.listaEspecialidades.addAll(listaEspecialidades);
+        notifyDataSetChanged();
+    }
 
 }

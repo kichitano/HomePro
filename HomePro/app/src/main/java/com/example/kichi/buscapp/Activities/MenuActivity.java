@@ -3,11 +3,13 @@ package com.example.kichi.buscapp.Activities;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,12 +18,10 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,28 +29,36 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.SearchView;
-import android.widget.SearchView.OnQueryTextListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.kichi.buscapp.Fragments.EspecialidadFragment;
 import com.example.kichi.buscapp.Fragments.ProfesionalesFragment;
 import com.example.kichi.buscapp.R;
+import com.example.kichi.buscapp.pkgEntidad.ClsEntidadEspecialidad;
+import com.example.kichi.buscapp.pkgNegocios.ClsNegociosEspecialidad;
 
-public class MenuActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class MenuActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
     private View mMenuFormView;
     private View mProgressView;
-    Boolean Validacion=false;
     int act = 0;
     String emailU;
     String nombreU;
     String apellidoU;
     String fotoU;
     String direccionU;
-    MenuItem searchMenuItem;
-    SearchView searchView;
+    ArrayList<String> listaEspecialidad = null;
+    private SensorManager mSensorManager;
+    private float mAccel; // acceleration apart from gravity
+    private float mAccelCurrent; // current acceleration including gravity
+    private float mAccelLast; // last acceleration including gravity
+
+
 
 
     @Override
@@ -60,7 +68,6 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
         // Quitar Action Bar
-
 
         setContentView(R.layout.activity_menu);
 
@@ -84,7 +91,6 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
 
                 //MenuActivity.this.getFragmentManager().popBackStack();
 
-
                 if(act == 0) {
                     act = 1;
                     runOnUiThread(new Runnable() {
@@ -102,15 +108,13 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
                             args.putString("fotoU",fotoU);
                             args.putString("direccionU",direccionU);
 
-
-
                             //Una vez haz creado tu instancia de TestFragment y colocado el Bundle entre sus argumentos, usas el FragmentManager para iniciarla desde tu segunda actividad.
                             FragmentManager fragmentManager = getSupportFragmentManager();
                             FragmentTransaction transaction = fragmentManager.beginTransaction();
                             ProfesionalesFragment fragment = new ProfesionalesFragment();
                             fragment.setArguments(args);
 
-                            transaction.replace(R.id.contenedor, fragment);
+                            transaction.replace(R.id.contenedor, fragment,"ProfesionalesFragment");
                             transaction.addToBackStack(null);
                             showProgress(false);
                             transaction.commit();
@@ -119,7 +123,9 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
                     });
                 }else{
                     act = 0;
-                    MenuActivity.this.getFragmentManager().popBackStack();
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    getFragmentManager().popBackStack();
+                    fragmentManager.beginTransaction().remove(fragmentManager.findFragmentByTag("ProfesionalesFragment"));
                     fab.setImageResource(R.drawable.vista);
                 }
 
@@ -148,61 +154,28 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         EspecialidadFragment fragment = new EspecialidadFragment();
         fragment.setArguments(args);
-        transaction.add(R.id.contenedor,fragment);
+        transaction.add(R.id.contenedor,fragment,"EspecialidadFragment");
         transaction.commit();
 
         mMenuFormView = findViewById(R.id.contenedor);
         mProgressView = findViewById(R.id.menu_progress);
 
-    }
+        MenuActivity clase = this;
+        CargarEspecialidades cargarEspecialidades = clase.new CargarEspecialidades();
+        cargarEspecialidades.execute();
 
+        /* do this in onCreate */
+        mSensorManager = (SensorManager) getSystemService(this.SENSOR_SERVICE);
+        mSensorManager.registerListener(mSensorListener, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+        mAccel = 0.00f;
+        mAccelCurrent = SensorManager.GRAVITY_EARTH;
+        mAccelLast = SensorManager.GRAVITY_EARTH;
 
-    public class CargarTodosProfesionales extends AsyncTask<Void, Void, Boolean> {
-
-        @Override
-        protected void onPreExecute() {
-
+        if (mAccel > 12) {
+            Toast toast = Toast.makeText(getApplicationContext(), "Device has shaken.", Toast.LENGTH_LONG);
+            toast.show();
         }
 
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-            Boolean resp = false;
-            MtdCargarProfesionales();
-            if(Validacion==true){
-                resp = true;
-            }else {
-                resp = false;
-            }
-            return resp;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            if(success) {
-                showProgress(false);
-                finish();
-            }else {
-                showProgress(false);
-            }
-        }
-    }
-
-    private void MtdCargarProfesionales() {
-        showProgress(true);
-
-        // Creamos un nuevo Bundle
-        Bundle args = new Bundle();
-        args.putInt("visualiza", 1);
-
-        //Una vez haz creado tu instancia de TestFragment y colocado el Bundle entre sus argumentos, usas el FragmentManager para iniciarla desde tu segunda actividad.
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        ProfesionalesFragment fragment = new ProfesionalesFragment();
-        fragment.setArguments(args);
-
-        transaction.replace(R.id.contenedor,fragment);
-        transaction.commit();
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
@@ -272,52 +245,47 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
         textView2.setText(nombreU+ " " + apellidoU);                            //Seteamos los datos
         imageView.setImageBitmap(decodedBitmap);
 
-        getMenuInflater().inflate(R.menu.menu, menu);
-
-        SearchManager searchManager = (SearchManager)getSystemService(Context.SEARCH_SERVICE);
-        searchMenuItem = menu.findItem(R.id.buscador);
-        searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-
-
-        searchView.setSubmitButtonEnabled(true);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-
-                
-
-                return true;
-            }
-        });
+        getMenuInflater().inflate(R.menu.menu_scrolling, menu);
 
         return true;
     }
 
+    //EspecialidadFragment especialidadFragment = (EspecialidadFragment)getSupportFragmentManager().findFragmentByTag("EspecialidadFragment");
+    //ProfesionalesFragment profesionalesFragment = (ProfesionalesFragment)getSupportFragmentManager().findFragmentByTag("ProfesionalesFragment");
 
 
+    public class CargarEspecialidades extends AsyncTask<Void, Void, Boolean> {
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.MostrarTodos) {
-            return true;
-        } else if (id == R.id.MostrarPrincipales){
-
-        } else if (id == R.id.buscador){
+        @Override
+        protected void onPreExecute() {
 
         }
-        return super.onOptionsItemSelected(item);
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            // TODO: attempt authentication against a network service.
+            ClsNegociosEspecialidad negociosEspecialidad = new ClsNegociosEspecialidad();
+            listaEspecialidad = new ArrayList<>();
+
+            try {
+                listaEspecialidad = negociosEspecialidad.cargarEspecialidad();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            final List datos = new ArrayList<>();
+            for (int o = 0; o <= listaEspecialidad.size() - 2; o += 2) {
+                String idEspecialidad = listaEspecialidad.get(o);
+                String Nombre =  listaEspecialidad.get(o + 1);
+                datos.add(new ClsEntidadEspecialidad(idEspecialidad,Nombre));
+            }
+            return false;
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+
+        }
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -343,6 +311,34 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private final SensorEventListener mSensorListener = new SensorEventListener() {
+
+        public void onSensorChanged(SensorEvent se) {
+            float x = se.values[0];
+            float y = se.values[1];
+            float z = se.values[2];
+            mAccelLast = mAccelCurrent;
+            mAccelCurrent = (float) Math.sqrt((double) (x*x + y*y + z*z));
+            float delta = mAccelCurrent - mAccelLast;
+            mAccel = mAccel * 0.9f + delta; // perform low-cut filter
+        }
+
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        }
+    };
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mSensorManager.registerListener(mSensorListener, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    @Override
+    protected void onPause() {
+        mSensorManager.unregisterListener(mSensorListener);
+        super.onPause();
     }
 
 }
