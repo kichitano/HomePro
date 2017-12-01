@@ -20,8 +20,8 @@ public class ClsConexion {
         try {
             Class.forName("net.sourceforge.jtds.jdbc.Driver");
             //ConnectionURL = "jdbc:jtds:sqlserver://192.168.2.106;port=1433;databaseName=homepro;user=sa;password=123;";
-            ConnectionURL = "jdbc:jtds:sqlserver://192.168.1.4;port=1433;databaseName=homepro;user=sa;password=123;";
-            //ConnectionURL = "jdbc:jtds:sqlserver://homeproserver.database.windows.net;port=1433;databaseName=HomePro;user=kichitano;password=Cerebro123;";
+            //ConnectionURL = "jdbc:jtds:sqlserver://192.168.1.4;port=1433;databaseName=homepro;user=sa;password=123;";
+            ConnectionURL = "jdbc:jtds:sqlserver://homeproserver.database.windows.net;port=1433;databaseName=HomePro;user=kichitano;password=Cerebro123;";
             connection = DriverManager.getConnection(ConnectionURL);
         } catch (SQLException se) {
             Log.e("ERROR", se.getMessage());
@@ -39,8 +39,8 @@ public class ClsConexion {
         try {
             Class.forName("net.sourceforge.jtds.jdbc.Driver");
             //String con = "jdbc:jtds:sqlserver://192.168.2.106;port=1433;databaseName=homepro;user=sa;password=123;";
-            String con = "jdbc:jtds:sqlserver://192.168.1.4;port=1433;databaseName=homepro;user=sa;password=123;";
-            //String con = "jdbc:jtds:sqlserver://homeproserver.database.windows.net;port=1433;databaseName=HomePro;user=kichitano;password=Cerebro123;";
+            //String con = "jdbc:jtds:sqlserver://192.168.1.4;port=1433;databaseName=homepro;user=sa;password=123;";
+            String con = "jdbc:jtds:sqlserver://homeproserver.database.windows.net;port=1433;databaseName=HomePro;user=kichitano;password=Cerebro123;";
             connection = DriverManager.getConnection(con);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();

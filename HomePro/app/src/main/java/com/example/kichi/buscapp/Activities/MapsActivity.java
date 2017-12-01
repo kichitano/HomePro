@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
@@ -31,6 +32,10 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+
+import java.util.ArrayList;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener,LocationListener {
 
@@ -154,14 +159,34 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     markerP.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
                     locP = mGoogleMap.addMarker(markerP);
                     locP.showInfoWindow();
-                    locP.setTag(telefonoP);
+                    locP.setTag(99);
 
                     mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLngU,18));
+
+                    //LINEA RECTA EN MAPA
+
+                    ArrayList<LatLng> points; //added
+                    Polyline line; //added
+                    points = new ArrayList<LatLng>(); //added
+
+                    points.add(latLngU); //added
+                    points.add(latLngP); //added
+
+                    PolylineOptions options = new PolylineOptions().width(5).color(Color.BLUE).geodesic(true);
+                    for (int i = 0; i < points.size(); i++) {
+                        LatLng point = points.get(i);
+                        options.add(point);
+                    }
+                    mGoogleMap.addPolyline(options);
+
+                    //LINEA RECTA EN MAPA
 
                     mGoogleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                         @Override
                         public boolean onMarkerClick(Marker marker) {
-                            MtdLlamar();
+                            if(marker.getTag()==locP.getTag()) {
+                                MtdLlamar();
+                            }
                             return false;
                         }
                     });
@@ -228,7 +253,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18));
             mCurrLocationMarker.showInfoWindow();
             lng = location.getLongitude();
-            lat = location.getLongitude();
+            lat = location.getLatitude();
 
             CONT = 1;
         }
@@ -309,6 +334,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public void GuardarUbicacion(View view) {
         String latlng = String.valueOf(lat) + "@" + String.valueOf(lng) ;
+        Toast.makeText(this,lat + " " + lng,Toast.LENGTH_SHORT).show();
         Intent data = new Intent();
         data.setData(Uri.parse(latlng));
         setResult(RESULT_OK, data);
