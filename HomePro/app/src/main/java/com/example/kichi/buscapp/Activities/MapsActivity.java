@@ -11,6 +11,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.Icon;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -39,6 +40,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Dash;
 import com.google.android.gms.maps.model.Dot;
@@ -82,6 +84,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     String datosP,telefonoP,latP,lngP;
     String emailU,nombreU,apellidoU,fotoU,latU,lngU;
     ArrayList<ClsEntidadMapa> arrayListMapa = null;
+    List<Marker> markers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -115,7 +118,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             fotoU = extras.getString("fotoU","");
             latU = extras.getString("latU", "");
             lngU = extras.getString("lngU", "");
-
+            setPosicion =(Button)findViewById(R.id.btnSetLatLng);
+            setPosicion.setVisibility(View.GONE);
         }else{
             CONT = 0;
             setPosicion=(Button)findViewById(R.id.btnSetLatLng);
@@ -262,42 +266,40 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 locU.showInfoWindow();
                 locU.setTag("x");
 
-                int lim = arrayListMapa.size()-1;
-                final Marker[] locE = new Marker[lim];
+                markers = new ArrayList<Marker>();
 
                 for(int i=0;i<arrayListMapa.size();i++){
+                    Marker locE;
 
                     LatLng latLngP = new LatLng(Double.parseDouble(arrayListMapa.get(i).getLat_persona()),Double.parseDouble(arrayListMapa.get(i).getLng_persona()));
                     MarkerOptions markerP = new MarkerOptions();
                     markerP.position(latLngP);
                     markerP.title(arrayListMapa.get(i).getNombre_persona() + " " + arrayListMapa.get(i).getApellido_persona());
-                    String imagen = arrayListMapa.get(i).getDescripcion_especialidad().toLowerCase() + "_mrk.png";
 
-                    int id = context.getResources().getIdentifier(imagen,"drawable",context.getPackageCodePath());
-                    Drawable drawable = context.getResources().getDrawable(id);
+                    String imagen = arrayListMapa.get(i).getDescripcion_especialidad().toLowerCase() + "_mrk";
+                    //markerU.icon(BitmapDescriptorFactory.fromPath("src/main/res/drawable/"+imagen+".png"));
 
-                    Bitmap bitmap = ((BitmapDrawable)drawable).getBitmap();
-                    markerP.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
+                    markerP.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+                    markerP.snippet(arrayListMapa.get(i).getTelefono_persona());
 
-                    locE[i] = mGoogleMap.addMarker(markerP);
-                    locE[i].showInfoWindow();
-                    locE[i].setTag(i);
+                    locE = mGoogleMap.addMarker(markerP);
+                    locE.setTag(arrayListMapa.get(i).getTelefono_persona());
 
-                    final int finalI = i;
-                    final ArrayList<ClsEntidadMapa> finalArrayListMapa = arrayListMapa;
+                    markers.add(locE);
+
                     mGoogleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                         @Override
                         public boolean onMarkerClick(Marker marker) {
-                            if(marker.getTag()==locE[finalI].getTag()) {
-                                telefonoP = finalArrayListMapa.get(0).getTelefono_persona();
+                            telefonoP = String.valueOf(marker.getTag());
+                            if(!telefonoP.equals("x"))
                                 MtdLlamar();
-                            }
                             return false;
                         }
                     });
+
                 }
 
-                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLngU,18));
+                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLngU,15));
             }
         }
     }

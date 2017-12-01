@@ -67,7 +67,6 @@ public class AdaptadorEspecialidad extends RecyclerView.Adapter<AdaptadorEspecia
         viewHolder.IdEspecialidad.setText(items.get(i).getId_espcialidad());
         viewHolder.descripcionEspecialidad.setText(items.get(i).getDescripcion_especialidad());
 
-
         String nombreEspecialidad = items.get(i).getDescripcion_especialidad().toLowerCase();
 
         int id = context.getResources().getIdentifier(nombreEspecialidad, "drawable", context.getPackageName());
