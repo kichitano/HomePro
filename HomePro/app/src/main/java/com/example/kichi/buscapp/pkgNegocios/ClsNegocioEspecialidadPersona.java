@@ -1,11 +1,14 @@
 package com.example.kichi.buscapp.pkgNegocios;
 
 import com.example.kichi.buscapp.pkgEntidad.ClsEntidadEspecialidadPersona;
+import com.example.kichi.buscapp.pkgEntidad.ClsEntidadMapa;
 import com.example.kichi.buscapp.pkgNegociosParticulares.ClsConexion;
 
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -32,5 +35,28 @@ public class ClsNegocioEspecialidadPersona {
             connection.close();
         }catch (Exception e){
         }
+    }
+
+    public ArrayList<ClsEntidadMapa> CargarPersonasEspecialidad() throws SQLException{
+        ArrayList<ClsEntidadMapa> todosProfMapa = new ArrayList<>();
+        con = new ClsConexion();
+        Connection connection = con.ConnectionHelper();
+        PreparedStatement preparedStatement = connection.prepareStatement("select nombre_persona,apellido_persona,telefono_persona,lat_persona,lng_persona,especialidad_principal_especialidad_persona,descripcion_especialidad from tbl_persona  inner join tbl_especialidad_persona on email_persona=email_persona_especialidad_persona inner join tbl_especialidad on id_especialidad = especialidad_principal_especialidad_persona\n" +
+                "where id_especialidad_especialidad_persona = especialidad_principal_especialidad_persona");
+        ResultSet rs = preparedStatement.executeQuery();
+        while (rs.next()){
+            ClsEntidadMapa clsEntidadMapa = new ClsEntidadMapa();
+            clsEntidadMapa.setNombre_persona(rs.getString(1));
+            clsEntidadMapa.setApellido_persona(rs.getString(2));
+            clsEntidadMapa.setTelefono_persona(rs.getString(3));
+            clsEntidadMapa.setLat_persona(rs.getString(4));
+            clsEntidadMapa.setLng_persona(rs.getString(5));
+            clsEntidadMapa.setEspecialidad_principal_especialidad_persona(rs.getString(6));
+            clsEntidadMapa.setDescripcion_especialidad(rs.getString(7));
+            todosProfMapa.add(clsEntidadMapa);
+        }
+        preparedStatement.close();
+        connection.close();
+        return todosProfMapa;
     }
 }

@@ -182,7 +182,7 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
             float delta = acelVal - acelLast;
             shake = shake * 0.9f + delta;
 
-            if(shake > 15){
+            if(shake > 86){
 
                 Bundle args = new Bundle();
                 String latlngU[] = direccionU.split("@");

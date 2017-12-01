@@ -2,10 +2,15 @@ package com.example.kichi.buscapp.Activities;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -20,6 +25,9 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.kichi.buscapp.R;
+import com.example.kichi.buscapp.pkgEntidad.ClsEntidadMapa;
+import com.example.kichi.buscapp.pkgNegocios.ClsNegocioEspecialidadPersona;
+import com.example.kichi.buscapp.pkgNegocios.ClsNegociosEspecialidad;
 import com.example.kichi.buscapp.pkgNegociosParticulares.DirectionsJSONParser;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -50,6 +58,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -69,9 +78,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     int codigo;
     double lat,lng;
     Button setPosicion;
-
+    private Context context;
     String datosP,telefonoP,latP,lngP;
     String emailU,nombreU,apellidoU,fotoU,latU,lngU;
+    ArrayList<ClsEntidadMapa> arrayListMapa = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -202,7 +212,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
                     });
                 }else if(CONT==3){
-
+                    MapsActivity clase = this;
+                    CargarTodosProfesionales cargarTodosProfesionales = clase.new CargarTodosProfesionales();
+                    cargarTodosProfesionales.execute();
                 }
 
             } else {
@@ -214,6 +226,79 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             buildGoogleApiClient();
             mGoogleMap.setMyLocationEnabled(true);
 
+        }
+    }
+
+    public class CargarTodosProfesionales extends AsyncTask<Void, Void, Boolean> {
+
+        @Override
+        protected void onPreExecute() {
+
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            // TODO: attempt authentication against a network service.
+            Boolean resp = true;
+            ClsNegocioEspecialidadPersona clsNegocioEspecialidadPersona = new ClsNegocioEspecialidadPersona();
+            try {
+                arrayListMapa = new ArrayList<>(clsNegocioEspecialidadPersona.CargarPersonasEspecialidad());
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return resp;
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            if(success) {
+                context = getApplicationContext();
+                LatLng latLngU = new LatLng(Double.parseDouble(latU),Double.parseDouble(lngU));
+                MarkerOptions markerU = new MarkerOptions();
+                markerU.position(latLngU);
+                markerU.title("Yo :)");
+                markerU.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                locU = mGoogleMap.addMarker(markerU);
+                locU.showInfoWindow();
+                locU.setTag("x");
+
+                int lim = arrayListMapa.size()-1;
+                final Marker[] locE = new Marker[lim];
+
+                for(int i=0;i<arrayListMapa.size();i++){
+
+                    LatLng latLngP = new LatLng(Double.parseDouble(arrayListMapa.get(i).getLat_persona()),Double.parseDouble(arrayListMapa.get(i).getLng_persona()));
+                    MarkerOptions markerP = new MarkerOptions();
+                    markerP.position(latLngP);
+                    markerP.title(arrayListMapa.get(i).getNombre_persona() + " " + arrayListMapa.get(i).getApellido_persona());
+                    String imagen = arrayListMapa.get(i).getDescripcion_especialidad().toLowerCase() + "_mrk.png";
+
+                    int id = context.getResources().getIdentifier(imagen,"drawable",context.getPackageCodePath());
+                    Drawable drawable = context.getResources().getDrawable(id);
+
+                    Bitmap bitmap = ((BitmapDrawable)drawable).getBitmap();
+                    markerP.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
+
+                    locE[i] = mGoogleMap.addMarker(markerP);
+                    locE[i].showInfoWindow();
+                    locE[i].setTag(i);
+
+                    final int finalI = i;
+                    final ArrayList<ClsEntidadMapa> finalArrayListMapa = arrayListMapa;
+                    mGoogleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                        @Override
+                        public boolean onMarkerClick(Marker marker) {
+                            if(marker.getTag()==locE[finalI].getTag()) {
+                                telefonoP = finalArrayListMapa.get(0).getTelefono_persona();
+                                MtdLlamar();
+                            }
+                            return false;
+                        }
+                    });
+                }
+
+                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLngU,18));
+            }
         }
     }
 
