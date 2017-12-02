@@ -21,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,7 +49,10 @@ public class ProfesionalActivity extends AppCompatActivity implements View.OnCli
     String fotoU;
     String direccionU;
     RatingBar ratingBar;
+    RelativeLayout cajaComentario;
     float valoracion;
+    TextView txtComentario;
+    Button btnComentar;
 
     ClsNegocioComentario clsNegocioComentario;
     ArrayList<ClsEntidadComentario> arrayListComentario;
@@ -85,7 +89,14 @@ public class ProfesionalActivity extends AppCompatActivity implements View.OnCli
         TextView txtemail = (TextView) findViewById(R.id.emailProfesional);
         TextView txtdireccion = (TextView) findViewById(R.id.direccionProfesional);
         TextView headscrooling = (TextView)findViewById(R.id.head_scrooling);
+        FloatingActionButton fbcomentario = (FloatingActionButton) findViewById(R.id.fbcomentario);
+        btnComentar = (Button)findViewById(R.id.BtnComentar);
+        txtComentario = (TextView) findViewById(R.id.TxtComentario);
+
+
         ratingBar = (RatingBar)findViewById(R.id.ratingbarprofesional);
+        cajaComentario = (RelativeLayout)findViewById(R.id.CajaComentario);
+
 
         headscrooling.setText(nombreapellidoP);
         txtemail.setText(emailP);
@@ -98,7 +109,9 @@ public class ProfesionalActivity extends AppCompatActivity implements View.OnCli
 
         fabmensaje.setOnClickListener(this);
         btntelefono.setOnClickListener(this);
+        fbcomentario.setOnClickListener(this);
         btndireccionPro.setOnClickListener(this);
+        btnComentar.setOnClickListener(this);
 
         ProfesionalActivity clase = this;
         CargarComentarios cargarComentarios = clase.new CargarComentarios();
@@ -164,7 +177,30 @@ public class ProfesionalActivity extends AppCompatActivity implements View.OnCli
                 startActivityForResult(intent,50);
 
                 break;
+            case  R.id.fbcomentario:
+                    if(cajaComentario.getVisibility() == View.GONE){
+                        cajaComentario.setVisibility(View.VISIBLE);
+                    }else {
+                        cajaComentario.setVisibility(View.GONE);
+                    }
+                break;
+            case R.id.BtnComentar:
+                String comentario = txtComentario.getText().toString();
+                MtdGuardarComentario(emailU,emailP,comentario,0.0);
+                break;
         }
+    }
+
+    private void MtdGuardarComentario(String emailU, String emailP, String comentario, double v) {
+        ClsEntidadComentario clsEntidadComentario = new ClsEntidadComentario();
+        clsEntidadComentario.setEmail_persona_comentario(emailU);
+        clsEntidadComentario.setEmail_persona_especialista(emailP);
+        clsEntidadComentario.setComentario_persona(comentario);
+        clsEntidadComentario.setRating_especialista(String.valueOf(v));
+        clsEntidadComentario.setFoto_persona(comentario);
+
+        ClsNegocioComentario clsNegocioComentario = new ClsNegocioComentario();
+        clsNegocioComentario.guardarComentario(clsEntidadComentario);
     }
 
 
@@ -212,8 +248,6 @@ public class ProfesionalActivity extends AppCompatActivity implements View.OnCli
 
                         ImageView imagenComenta = (ImageView)view.findViewById(R.id.foto_comentario);
                         imagenComenta.setImageBitmap(decodedBitmap);
-
-                        valoracion = valoracion + Float.parseFloat(((ClsEntidadComentario)entrada).getRating_especialista());
                     }
                 });
 
